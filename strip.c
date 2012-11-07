@@ -13,7 +13,7 @@ char* strip(char* str)
 	printf("DEBUG: durchsuche %s\n\n", str);
 	
 	while (pos != 0) {												// Wiederhole, solange '/' folgen:
-		if ((pos = strchr(pos, '/'))) {								// falls (noch eine) mögliche Folge von '/' ex.,
+		if ((pos = strchr(pos, '/')) != 0) {						// falls (noch eine) mögliche Folge von '/' ex.,
 			sub = pos;												// dessen Anfangsposition merken
 	
 			printf("DEBUG: erster (lokaler) slash ab %s\n", pos);
@@ -24,8 +24,8 @@ char* strip(char* str)
 	
 			printf("DEBUG: letzter (lokaler) slash vor %s\n", sub);
 			
-			if (sub > pos+1) {										// falls mehr als ein '/' hintereinander vorkam...
-				printf("DEBUG: entferne %ld mal '/'\n", sub-pos-1);
+			if (sub > ++pos) {										// falls mehr als ein '/' hintereinander vorkam...
+				printf("DEBUG: entferne %ld mal '/'\n", sub-pos);
 	
 				if ((tmp = malloc(strlen(sub))) == (char*) NULL) {	// Platz für den "Suffix" allokieren
 					printf("DEBUG: Fehler beim allokieren von %ld Zeichen. Gebe auf..\n\n", (long) strlen(sub));
@@ -34,15 +34,12 @@ char* strip(char* str)
 				
 				strncpy(tmp, sub, strlen(sub));						// Substring temporär umkopieren
 				*(tmp + strlen(sub)) = '\0';						// terminieren nicht vergessen...
-				strncpy(pos+1, tmp, strlen(sub));					// temporäre Kopie ans Ziel schreiben
-				*(pos+1 + strlen(sub)) = '\0';						// terminieren nicht vergessen...
+				strncpy(pos, tmp, strlen(sub));						// temporäre Kopie ans Ziel schreiben
+				*(pos + strlen(sub)) = '\0';						// terminieren nicht vergessen...
 
-				printf("DEBUG: extrahierter Rest ist %s\n", tmp);
 				printf("DEBUG: neuer Zwischenstand wird %s\n\n", str);
 
 				free(tmp);											// allokierten Platz freigeben
-
-				pos++;												// setze fort hinter erstem '/'
 			}
 			else {
 				pos = sub;											// setze fort hinter *dem* '/'
