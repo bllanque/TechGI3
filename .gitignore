@@ -2,3 +2,4 @@
 *.zip
 depend
 stripstring
+.DS_Store

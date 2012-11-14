@@ -1,12 +1,23 @@
-
-BIN = stripstring
-SRC = $(wildcard *.c)
-HDRS = $(filter-out main.h, $(patsubst %.c, %.h, $(SRC)))
-	
-EXTRA_DIST_FILES = 
+# Einstellungen für das 2. Aufgabenblatt
+#    Diese Einstellungen müssen sie anpassen, wenn sie zusätzliche Dateien hinzufügen
+BIN = mandelbrot
+SRC = \
+	bitmap.c \
+	color.c \
+	util.c \
+	main.c \
+	mandelbrot.c \
+	$(null)
+HDRS = \
+	bitmap.h \
+	color.h \
+	util.h \
+	mandelbrot.h \
+	$(null)
+EXTRA_DIST_FILES = README
 
 # Einstellungen für den Übersetzer
-#    Diese Einstellungen müssen Sie ggf. an ihr System anpassen
+#    Diese Einstellungen müssen sie ggf. an ihr System anpassen
 CFLAGS  = -std=c99 -g -Wall -Wextra -O2
 LDFLAGS = -lm
 
@@ -34,7 +45,7 @@ debug: $(BIN)
 	$(GDB) ./$(BIN)
 
 run: $(BIN)
-	./$(BIN)
+	./$(BIN) mandelbrot.bmp
 
 rebuild: distclean all
 
@@ -64,6 +75,6 @@ clean:
 	$(RM) $(BIN) $(OBJS) $(DEPENDFILE)
 
 distclean: clean
-	$(RM) $(DISTFILE).tar.bz2 $(DISTFILE).zip
+	$(RM) $(DISTFILE).tar.bz2 $(DISTFILE).zip *.bmp
 
 .PHONY: clean debug dist distclean loc rerun rebuild run zip
