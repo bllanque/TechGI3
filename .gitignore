@@ -1,5 +1,7 @@
+.DS_Store
 *.o
 *.zip
 depend
 stripstring
-.DS_Store
+mandelbrot
+bild.bmp

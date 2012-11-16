@@ -38,9 +38,33 @@ int main(int argc, char** argv) {
 
 			/* Startzeit messen */
 			start = current_time_millis();
+			
+			/*
+			 * Beginn der Aenderungen
+			 */ 
 
-			/* Bildberechnung durchführen */
-			calc_mandelbrot(data, width, height, 0, 0, width, height);
+			// Anzahl der Bild-Unterteilungen in einzelne Blšcke
+			unsigned int num_blocks = 16;
+			
+			// wiederholte Berechnung fŸr jeden Block
+			for (unsigned int i = 0; i < num_blocks; i++) {
+
+				
+				int x = 0;							// alle Blšcke sind lediglich waagerecht unterteilt
+				int y = i * height / num_blocks;	// jeder Block sitzt unterhalb seines VorgŠngerblocks
+				int w = width;						// alle Blšcke erstrecken sich Ÿber die volle Bildbreite
+				int h = height / num_blocks;		// jeder Block hat gleiche Hšhe
+				
+				printf("Block %d: (x,y) = (%d,%d), (w,h) = (%d,%d)\n", i, x, y, w, h);
+
+				/* Bildberechnung durchführen */
+				calc_mandelbrot(data + i*w*h, width, height, x, y, w, h);
+
+			}
+
+			/*
+			 * Abschluss der Aenderungen
+			 */ 
 
 			/* berechnete Bilddaten in die Ausgabedatei schreiben */
 			fwrite(data, sizeof(pixel_data_t), width*height, file);
