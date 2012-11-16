@@ -6,7 +6,7 @@
 /** Maximale Anzahl der Iterationen zur Bestimmung der Konvergenz der Folge.
  *  Kann reduziert werden, falls die Berechnung zu lange dauert.
  */
-#define MAX_ITERATIONS 100
+#define MAX_ITERATIONS 1000
 
 /** Gibt die X-Komponente (Realteil) des Bildmittelpunktes an */
 #define CENTER_X -1.1728    /* Standard: -0.4 */
