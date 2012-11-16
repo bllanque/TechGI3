@@ -7,7 +7,10 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+
+#ifdef _OPENMP
 #include <omp.h>
+#endif
 
 #define WIDTH  3200
 #define HEIGHT 2400
@@ -40,26 +43,35 @@ int main(int argc, char** argv) {
 			/* Startzeit messen */
 			start = current_time_millis();
 			
-#ifdef _OPENMP
-			/* mit OpenMP rechnen */
-			#pragma omp parallel 
+			/* Beginn der Änderungen */
+			
+			int block = 0;									// Index des aktuellen Blocks 
+			int count = 60;									// Anzahl Blöcke
+			int rank  = 0;									// Nummer des aktuellen Threads
+			
+			#ifdef _OPENMP
+			#pragma omp parallel private(rank, block)		// Laufvariable und Threadnummer eindeutig je Thread
+			#endif
 			{
-                int i = omp_get_thread_num();			// Nummer des aktuellen Threads
-                int count = omp_get_num_threads();		// Anzahl der insgesamt verfügbaren Threads
-#else
-			/* sequentiell rechnen */
-			int count = 16;								// Anzahl sequentieller Schritte 
-			for (int i = 0; i < count; i++) 			// welche als Schleife ausgeführt werden
-			{
-#endif
-				int y = i * height / count;				// jeder Block sitzt unterhalb seines Vorgaengerblocks
-				int h = height / count;					// jeder Block hat gleiche Hoehe
-				
-				printf("Block %d: (x,y) = (%d,%d), (w,h) = (%d,%d)\n", i, 0, y, width, (i+1) * h);
+				#ifdef _OPENMP
+            	rank = omp_get_thread_num();				// Anzahl der insgesamt verfügbaren Threads				
+				#pragma omp for
+				#endif
 
-				/* Bildberechnung durchf¸hren */
-				calc_mandelbrot(data + i * width * h, width, height, 0, y, width, h);
+				for (block = 0; block < count; block++) 	// Blöcke in einer Schleife berechnen
+				{
+					int y = block * height / count;			// jeder Block sitzt unterhalb seines Vorgaengerblocks
+					int h = height / count;					// jeder Block hat gleiche Hoehe
+					
+					printf("Block %3d von %d berechnet von Thread %3d: (x1,y1) = (%d,%4d), (x2,y2) = (%d,%4d)\n", block+1, count, rank, 0, y, width, (block+1) * h);
+	
+					/* Bildberechnung durchf¸hren */
+					calc_mandelbrot(data + block * width * h, width, height, 0, y, width, h);
+				}
+				
 			}
+            
+            /* Abschluss der Änderungen */
             
 			/* berechnete Bilddaten in die Ausgabedatei schreiben */
 			fwrite(data, sizeof(pixel_data_t), width*height, file);
