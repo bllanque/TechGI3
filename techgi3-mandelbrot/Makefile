@@ -18,7 +18,7 @@ EXTRA_DIST_FILES = README
 
 # Einstellungen für den Übersetzer
 #    Diese Einstellungen müssen sie ggf. an ihr System anpassen
-CFLAGS  = -std=c99 -g -Wall -Wextra -O2
+CFLAGS  = -std=c99 -g -Wall -Wextra -O2 -fopenmp
 LDFLAGS = -lm
 
 BZIP2  = bzip2

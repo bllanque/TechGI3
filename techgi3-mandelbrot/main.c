@@ -7,6 +7,7 @@
 #include <string.h>
 #include <errno.h>
 #include <time.h>
+#include <omp.h>
 
 #define WIDTH  3200
 #define HEIGHT 2400
@@ -39,33 +40,27 @@ int main(int argc, char** argv) {
 			/* Startzeit messen */
 			start = current_time_millis();
 			
-			/*
-			 * Beginn der Aenderungen
-			 */ 
-
-			// Anzahl der Bild-Unterteilungen in einzelne Blöcke
-			unsigned int num_blocks = 16;
-			
-			// wiederholte Berechnung für jeden Block
-			for (unsigned int i = 0; i < num_blocks; i++) {
-
+#ifdef _OPENMP
+			/* mit OpenMP rechnen */
+			#pragma omp parallel 
+			{
+                int i = omp_get_thread_num();			// Nummer des aktuellen Threads
+                int count = omp_get_num_threads();		// Anzahl der insgesamt verfügbaren Threads
+#else
+			/* sequentiell rechnen */
+			int count = 16;								// Anzahl sequentieller Schritte 
+			for (int i = 0; i < count; i++) 			// welche als Schleife ausgeführt werden
+			{
+#endif
+				int y = i * height / count;				// jeder Block sitzt unterhalb seines Vorgaengerblocks
+				int h = height / count;					// jeder Block hat gleiche Hoehe
 				
-				int x = 0;							// alle Blöcke sind lediglich waagerecht unterteilt
-				int y = i * height / num_blocks;	// jeder Block sitzt unterhalb seines Vorgängerblocks
-				int w = width;						// alle Blöcke erstrecken sich über die volle Bildbreite
-				int h = height / num_blocks;		// jeder Block hat gleiche Höhe
-				
-				printf("Block %d: (x,y) = (%d,%d), (w,h) = (%d,%d)\n", i, x, y, w, h);
+				printf("Block %d: (x,y) = (%d,%d), (w,h) = (%d,%d)\n", i, 0, y, width, (i+1) * h);
 
 				/* Bildberechnung durchf¸hren */
-				calc_mandelbrot(data + i*w*h, width, height, x, y, w, h);
-
+				calc_mandelbrot(data + i * width * h, width, height, 0, y, width, h);
 			}
-
-			/*
-			 * Abschluss der Aenderungen
-			 */ 
-
+            
 			/* berechnete Bilddaten in die Ausgabedatei schreiben */
 			fwrite(data, sizeof(pixel_data_t), width*height, file);
 
