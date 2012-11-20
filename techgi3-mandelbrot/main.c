@@ -14,13 +14,12 @@
 
 #define WIDTH  3200
 #define HEIGHT 2400
+#define COUNT 64
 
 int main(int argc, char** argv) {
-
 	int return_code = EXIT_FAILURE;
 	unsigned long start, end;
 	char *filename;
-	int count = 60;													// Anzahl Blöcke (muss Teiler von HEIGHT sein!)
 
 	if (argc != 2) {
 		printf("Usage: mandelbrot BMPFILE\n");
@@ -30,6 +29,15 @@ int main(int argc, char** argv) {
 
 	/* Grˆﬂe des gesamten, zu erzeugenden Bildes festlegen */
 	int width = WIDTH, height = HEIGHT;
+
+	/* Bestimmung geeigneter Blockgröße */
+	int lower = COUNT, upper = COUNT;									// untere und obere Schranke der Blockanzahl
+	int count;															// Anzahl Blöcke (sollte Teiler von HEIGHT sein!)
+
+	while (WIDTH % lower != 0) lower--;									// obere Schranke (nächstgrößerer Teiler)
+	while (HEIGHT % upper != 0) upper++;								// untere Schranke (nächstkleinerer Teiler) 
+
+	count = ((upper - count) < (count -lower)) ? upper : lower;			// als Blockzahl wird nächstbester Teiler verwendet
 
 	/* Puffer f¸r Bilddaten allokieren */
 	pixel_data_t *data = calloc(width*height, sizeof(pixel_data_t));
@@ -44,8 +52,6 @@ int main(int argc, char** argv) {
 
 			/* Startzeit messen */
 			start = current_time_millis();
-			
-			/* Beginn der Änderungen */	
 			
 			/* Bilddatei vorübergehend schließen */		
   			if (fclose(file) == 0) {
@@ -92,14 +98,11 @@ int main(int argc, char** argv) {
 				printf("Fehler bei der Freiabe der Datei: %s\n", strerror(errno));
 
 			pid_t wpid;
-			int status = 0;
-			
-			/* Beendigung aller Kindprozesse abwarten */
-			while ((wpid = wait(&status)) > 0) {
+
+				/* Beendigung aller Kindprozesse abwarten */
+			while ((wpid = wait(0)) > 0) {
 				printf("Prozess %3d: terminiert\n", (int) wpid);
         	}
-            
-            /* Abschluss der Änderungen */
             
 			/* Endzeit messen und Differenz ausgeben */
 			end = current_time_millis();
