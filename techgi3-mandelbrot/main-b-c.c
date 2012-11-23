@@ -34,7 +34,7 @@ int main(int argc, char** argv) {
 	int lower = COUNT, upper = COUNT;									// untere und obere Schranke der Blockanzahl
 	int count;															// Anzahl Blöcke (sollte Teiler von HEIGHT sein!)
 
-	while (WIDTH % lower != 0) lower--;									// obere Schranke (nächstgrößerer Teiler)
+	while (HEIGHT % lower != 0) lower--;								// obere Schranke (nächstgrößerer Teiler)
 	while (HEIGHT % upper != 0) upper++;								// untere Schranke (nächstkleinerer Teiler) 
 
 	count = ((upper - count) < (count -lower)) ? upper : lower;			// als Blockzahl wird nächstbester Teiler verwendet

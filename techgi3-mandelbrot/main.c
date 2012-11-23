@@ -8,13 +8,12 @@
 #include <errno.h>
 #include <time.h>
 
-#include <sys/types.h>
-#include <unistd.h>
-#include <sys/wait.h>
+#ifdef _OPENMP
+#include <omp.h>
+#endif
 
 #define WIDTH  3200
 #define HEIGHT 2400
-#define COUNT 64
 
 int main(int argc, char** argv) {
 	int return_code = EXIT_FAILURE;
@@ -30,15 +29,6 @@ int main(int argc, char** argv) {
 	/* Grˆﬂe des gesamten, zu erzeugenden Bildes festlegen */
 	int width = WIDTH, height = HEIGHT;
 
-	/* Bestimmung geeigneter Blockgröße */
-	int lower = COUNT, upper = COUNT;									// untere und obere Schranke der Blockanzahl
-	int count;															// Anzahl Blöcke (sollte Teiler von HEIGHT sein!)
-
-	while (WIDTH % lower != 0) lower--;									// obere Schranke (nächstgrößerer Teiler)
-	while (HEIGHT % upper != 0) upper++;								// untere Schranke (nächstkleinerer Teiler) 
-
-	count = ((upper - count) < (count -lower)) ? upper : lower;			// als Blockzahl wird nächstbester Teiler verwendet
-
 	/* Puffer f¸r Bilddaten allokieren */
 	pixel_data_t *data = calloc(width*height, sizeof(pixel_data_t));
 	if (data) {
@@ -53,64 +43,47 @@ int main(int argc, char** argv) {
 			/* Startzeit messen */
 			start = current_time_millis();
 			
-			/* Bilddatei vorübergehend schließen */		
-  			if (fclose(file) == 0) {
-						
-				for (int block = 0; block < count; block++) {		// Blöcke in einer Schleife berechnen
-					
-					if (fork() == (pid_t) 0) {						// sind wir parent oder child?
-
-						/* blockspezifische Parameter berechnen */
-						int y = block * height / count;				// jeder Block sitzt unterhalb seines Vorgaengerblocks
-						int h = height / count;						// jeder Block hat gleiche Hoehe
-						int rank = getpid();						// ggf. Nummer des aktuellen Threads
-						
-						/* wir sind Child */
-						printf("Block %3d von %d berechnet von Prozess %3d: (x1,y1) = (%d,%4d), (x2,y2) = (%d,%4d)\n", block+1, count, rank, 0, y, width, (block+1) * h);
-		
-						/* Bildberechnung durchf¸hren */
-						calc_mandelbrot(data + block * width * h, width, height, 0, y, width, h);
-	
-						/* Datei wieder zum schreiben öffnen */   
-						file = fopen(filename, "rb+");
-						
-						/* Schreibposition bestimmen */
-						int ofs = BITMAP_HEADER_SIZE + block * width * h * sizeof(pixel_data_t); 
-						
-						/* Schreibposition suchen */
-						fseek(file, ofs, SEEK_SET);
-						
-						/* Bitmap-Block schreiben */
-						printf("Block %3d von %d berechnet von Prozess %3d: Dateioffset %d\n", block+1, count, rank, ofs);
-
-						/* berechnete Bilddaten in die Ausgabedatei schreiben */
-						fwrite(data + block * width * h, sizeof(pixel_data_t), width * h, file);
-
-						/* Datei schliessen */
-						fclose(file);
-
-						/* Kindprozess beenden */
-						exit(0);
-					}
-				} 
+			/* Beginn der Änderungen */			
+			int count = 60;									// Anzahl Blöcke (muss Teiler von HEIGHT sein!)
+			int block;										// Index des aktuellen Blocks 
+			int rank;										// ggf. Nummer des aktuellen Threads
 			
- 			} else
-				printf("Fehler bei der Freiabe der Datei: %s\n", strerror(errno));
+			#ifdef _OPENMP
+			#pragma omp parallel private(rank, block)		// Laufvariable und Threadnummer eindeutig je Thread
+			#endif
+			{
+				#ifdef _OPENMP
+            	rank = omp_get_thread_num();				// via OpenMP Threadnummer ermitteln				
+				#pragma omp for
+				#endif
 
-			pid_t wpid;
-
-				/* Beendigung aller Kindprozesse abwarten */
-			while ((wpid = wait(0)) > 0) {
-				printf("Prozess %3d: terminiert\n", (int) wpid);
-        	}
+				for (block = 0; block < count; block++) 	// Blöcke in einer Schleife berechnen
+				{
+					int y = block * height / count;			// jeder Block sitzt unterhalb seines Vorgaengerblocks
+					int h = height / count;					// jeder Block hat gleiche Hoehe
+					
+					printf("Block %3d von %d berechnet von Thread %3d: (x1,y1) = (%d,%4d), (x2,y2) = (%d,%4d)\n", block+1, count, rank, 0, y, width, (block+1) * h);
+	
+					/* Bildberechnung durchf¸hren */
+					calc_mandelbrot(data + block * width * h, width, height, 0, y, width, h);
+				}
+				
+			}
+            /* Abschluss der Änderungen */
             
+			/* berechnete Bilddaten in die Ausgabedatei schreiben */
+			fwrite(data, sizeof(pixel_data_t), width*height, file);
+
+			/* Datei schliessen */
+			fclose(file);
+
 			/* Endzeit messen und Differenz ausgeben */
 			end = current_time_millis();
 			printf("%.2f Sekunden\n", (double)(end-start) / 1000);
 
 			/* positiven R¸ckgabewert festlegen */
 			return_code = EXIT_SUCCESS;
-		} else {
+		} else  {
 			printf("Fehler beim Erstellen der Datei: %s\n", strerror(errno));
 		}
 		
