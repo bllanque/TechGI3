@@ -5,3 +5,4 @@ depend
 stripstring
 mandelbrot
 *.bmp
+scheduler

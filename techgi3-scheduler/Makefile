@@ -2,6 +2,7 @@
 #    Diese Einstellungen müssen sie anpassen, wenn sie zusätzliche Dateien hinzufügen
 BIN = scheduler
 SRC = \
+	tasklist.c \
 	FIFO.c \
 	RR.c \
 	SJN.c \
@@ -11,6 +12,7 @@ SRC = \
 	sem_tests.c \
 	$(null)
 HDRS = \
+	tasklist.h \
 	FIFO.h \
 	RR.h \
 	SJN.h \
