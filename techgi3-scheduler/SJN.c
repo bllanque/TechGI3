@@ -1,25 +1,37 @@
-#include "SJN.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-/*
-TODO: Ergänzen sie hier ihre Schedulerimplementation.
-*/
+#include "SJN.h"
+#include "tasklist.h"
+#include "system.h"
+
+LIST* list;
 
 int init_SJN() {
-	/* TODO */
-
-	// Rückgabewert zu 1 ändern, sobald der Scheduler implementiert wurde!
-	return 0;
+	if (list) free(list);
+	
+	list = (LIST*) malloc(sizeof(LIST));
+	list->first = NULL;
+	list->last = NULL;
+	
+	return 1;
 }
 
 void arrive_SJN( int id, int length ) {
-	/* TODO */
+	insertTaskSJN(list, id, length);
+	
+	switch_task(list->first->task->id);
 }
 
 void tick_SJN() {
 	/* UNUSED */
 }
 
-
 void finish_SJN( int id ) {
-	/* TODO */
+	removeTask(list, id);
+	
+	if (list->first)
+		switch_task(list->first->task->id);
+	else 
+		switch_task(IDLE);
 }

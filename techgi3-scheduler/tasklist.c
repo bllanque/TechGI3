@@ -4,26 +4,50 @@
 #include "tasklist.h"
 #include "system.h"
 
-void insertTask(LIST* list, task* t) {
+void insertTaskSJN(LIST* list, int id, int length) {
+	NODE* cursor = list->first;
+	NODE* node = (NODE*) malloc(sizeof(NODE));
+	task* t = (task*) malloc(sizeof(task));
+	
+	t->id = id;
+	t->length = length;	
+	node->task = t;
+	node->next = NULL;
+
+	printf("debug: before insertion of (id: %d, length: %d) => ", id, length);
+	dumpList(list);
+
+	if (!cursor) {
+		list->first = node;
+		list->last = node;
+	}
+	else if (cursor->task->length >= length) {
+
+		node->next = cursor;
+		list->first = node;
+	}
+	else {
+		
+		while (cursor && cursor->task->length < length)
+			cursor = cursor->next;
+			
+		if (cursor) {
+			node->next = cursor->next;
+			cursor->next = node;
+		}
+	}
+
+	printf("debug:  after insertion of (id: %d, length: %d) => ", id, length);
+	dumpList(list);
 }
 
-void appendTaskByID(LIST* list, int id, int length) {
-	printf("debug: appendTaskByID: entering\n");
-
+void appendTask(LIST* list, int id, int length) {
+	NODE* node = (NODE*) malloc(sizeof(NODE));
 	task* t = (task*) malloc(sizeof(task));
 	
 	t->id = id;
 	t->length = length;
 	
-	appendTask(list, t);
-	printf("debug: appendTaskByID: leaving\n");
-}
-
-void appendTask(LIST* list, task* t) {
-	printf("debug: appendTask: entering\n");
-
-	NODE* node = (NODE*) malloc(sizeof(NODE));
-
 	node->task = t;
 	node->next = NULL;
 
@@ -34,25 +58,9 @@ void appendTask(LIST* list, task* t) {
 	
 	if (!list->first)
 		list->first = list->last;
-
-	printf("debug: appendTask: leaving\n");
 }
 
-void removeRightNode(LIST* list, NODE* node) {
-	printf("debug: removeRightTask: entering\n");
-	
-	NODE* temp = node->next;
-
-	node->next = node->next->next;
-
-	free(temp);
-
-	printf("debug: removeRightTask: leaving\n");
-}
-
-void removeTaskById(LIST* list, int id) {
-	printf("debug: removeTaskById: entering\n");
-
+void removeTask(LIST* list, int id) {
 	NODE* cursor = list->first;
 
 	if (cursor->task->id == id) {
@@ -66,12 +74,28 @@ void removeTaskById(LIST* list, int id) {
 			cursor = cursor->next;
 		
 		if (cursor) {
-			removeRightNode(list, cursor);
 			cursor->next = cursor->next->next;
 			if (id == list->last->task->id)
 				list->last = cursor;
 		}
 	}
+}
+
+void removeFirst(LIST* list) {
+	if (list->first) {
+		NODE* node = list->first;
+		list->first = list->first->next;
+		free(node);
+	}
+}
+
+void dumpList(LIST* list) {
+	NODE* cursor = list->first;
 	
-	printf("debug: removeTaskById: leaving\n");
+	while (cursor) {
+		printf("(id: %d, length: %d) ", cursor->task->id, cursor->task->length);
+		cursor = cursor->next;
+	}
+	
+	printf("\n");
 }

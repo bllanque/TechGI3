@@ -19,14 +19,12 @@ typedef struct list_s {
 	struct node_t *last;
 } LIST;
 
-void insertTask(LIST* list, task* t);
+void insertTaskSJN(LIST* list, int id, int length);
 
-void appendTaskByID(LIST* list, int id, int length);
+void appendTask(LIST* list, int id, int length);
 
-void appendTask(LIST* list, task* t);
+void removeTask(LIST* list, int id);
 
-void removeTaskById(LIST* list, int id);
-
-void removeRightNode(LIST* list, NODE* node);
+void removeFirst(LIST* list);
 
 #endif

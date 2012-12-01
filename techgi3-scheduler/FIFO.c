@@ -8,22 +8,19 @@
 LIST* fifo;
 
 int init_FIFO() {
-	printf("debug: init_FIFO: entering\n");
+	if (fifo) free(fifo);
 
 	fifo = (LIST*) malloc(sizeof(LIST));
 	fifo->first = NULL;
 	fifo->last = NULL;
 
-	printf("debug: init_FIFO: leaving\n");
 	return 1;
 }
 
 void arrive_FIFO( int id , int length ) {
-	printf("debug: arrive_FIFO: entering\n");
-	appendTaskByID(fifo, id, length);
+	appendTask(fifo, id, length);
 	
 	switch_task(fifo->first->task->id);
-	printf("debug: arrive_FIFO: leaving\n");
 }
 
 void tick_FIFO() {
@@ -31,13 +28,10 @@ void tick_FIFO() {
 }
 
 void finish_FIFO( int id ) {
-	printf("debug: finish_FIFO: entering\n");
-	removeTaskById(fifo, id);
+	removeTask(fifo, id);
 	
 	if (fifo->first)
 		switch_task(fifo->first->task->id);
-	else
+	else 
 		switch_task(IDLE);
-	
-	printf("debug: finish_FIFO: leaving\n");
 }
