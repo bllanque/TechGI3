@@ -83,15 +83,12 @@ int test_SJN( int* running ) {
 	task switchSequence[MAXTESTTASKS] = {{0, 9}, {4, 5}, {3, 6}, {2, 7}, {1, 8}};
 
 	// Tasks hinzufügen
-	printf("debug: inserting tasks...\n");
 	int i;
 	for ( i = 0; i < MAXTESTTASKS; i++ ) {
 		arrive_SJN( testTask[i].id, testTask[i].length - 2);
 	}
 
-	printf("debug: starting simulation...\n");
 	for ( int task_num = 0; task_num < MAXTESTTASKS; task_num++ ) {
-		printf("debug: simulating index %d...\n", task_num);
 		if ( *running != switchSequence[task_num].id ) {
 			printf( "ERROR!!! Scheduler switched to task %d, but task %d is shorter!\n", *running, switchSequence[task_num].id );
 			return 0;

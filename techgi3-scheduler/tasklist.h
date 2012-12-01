@@ -25,4 +25,6 @@ void appendTask(LIST* list, int id, int length);
 
 void removeTask(LIST* list, int id);
 
+void removeFirst(LIST* list);
+
 #endif
