@@ -6,6 +6,7 @@
 
 void insertTaskSJN(LIST* list, int id, int length) {
 	NODE* cursor = list->first;
+		
 	NODE* node = (NODE*) malloc(sizeof(NODE));
 	task* t = (task*) malloc(sizeof(task));
 	
@@ -17,24 +18,26 @@ void insertTaskSJN(LIST* list, int id, int length) {
 	printf("debug: before insertion of (id: %d, length: %d) => ", id, length);
 	dumpList(list);
 
-	if (!cursor) {
-		list->first = node;
-		list->last = node;
-	}
-	else if (cursor->task->length >= length) {
-
+	if ((!cursor) || (cursor->task->length > length)) {
 		node->next = cursor;
 		list->first = node;
+		list->last = (cursor) ? cursor : node;
 	}
 	else {
-		
-		while (cursor && cursor->task->length < length)
+		while (cursor && cursor->task->length <= length)
 			cursor = cursor->next;
 			
 		if (cursor) {
 			node->next = cursor->next;
 			cursor->next = node;
+
 		}
+		else {
+			printf("debug: new element larger than last in list\n");
+		}
+
+		if (!node->next)
+			list->last = node;
 	}
 
 	printf("debug:  after insertion of (id: %d, length: %d) => ", id, length);
@@ -70,22 +73,14 @@ void removeTask(LIST* list, int id) {
 			list->last = NULL;
 	}
 	else {
-		while (cursor && cursor->next->task->id != id)
+		while (cursor->next && cursor->next->task->id != id)
 			cursor = cursor->next;
 		
 		if (cursor) {
+			NODE* temp = cursor->next;
 			cursor->next = cursor->next->next;
-			if (id == list->last->task->id)
-				list->last = cursor;
+			free(cursor);
 		}
-	}
-}
-
-void removeFirst(LIST* list) {
-	if (list->first) {
-		NODE* node = list->first;
-		list->first = list->first->next;
-		free(node);
 	}
 }
 
