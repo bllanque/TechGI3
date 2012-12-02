@@ -1,30 +1,48 @@
-#include "RR.h"
+#include <stdlib.h>
+#include <stdio.h>
 
-/*
-TODO: Ergänzen sie hier ihre Schedulerimplementation.
-*/
+#include "RR.h"
+#include "tasklist.h"
+#include "system.h"
+
+LIST* queue;
+int tick = 0;
+int step;
 
 /**********************************************************
  ********     ROUND ROBIN mit Zeitscheibe T=1s     ********
  **********************************************************/
 
 int init_RR_1() {
-	/* TODO */
+	tick = 0;
+	step = 1;
 
-	// Rückgabewert zu 1 ändern, sobald der Scheduler implementiert wurde!
-	return 0;
+	if (queue) free(queue);
+	
+	queue = (LIST*) malloc(sizeof(LIST));
+	queue->first = NULL;
+	queue->last = NULL;
+	
+	return 1;
 }
 
 void arrive_RR_1( int id , int length ) {
-	/* TODO */
+	appendTask(queue, id, length);
+	
+	switch_task(queue->first->task->id);
 }
 
 void tick_RR_1() {
-	/* TODO */
+	if ((tick = tick++ % step) == 0)
+		appendNode(queue, removeFirst(queue));
+
+	switch_task((queue->first) ? queue->first->task->id : IDLE);
 }
 
 void finish_RR_1( int id ) {
-	/* TODO */
+	removeTask(queue, id);
+	
+	switch_task((queue->first) ? queue->first->task->id : IDLE);
 }
 
 /**********************************************************
@@ -32,20 +50,20 @@ void finish_RR_1( int id ) {
  **********************************************************/
 
 int init_RR_3() {
-	/* TODO */
+	init_RR_1();
+	step = 3;
 
-	// Rückgabewert zu 1 ändern, sobald der Scheduler implementiert wurde!
-	return 0;
+	return 1;
 }
 
 void arrive_RR_3( int id , int length ) {
-	/* TODO */
+	arrive_RR_1(id, length);
 }
 
 void tick_RR_3() {
-	/* TODO */
+	tick_RR_1();
 }
 
 void finish_RR_3( int id ) {
-	/* TODO */
+	return finish_RR_1(id);
 }

@@ -19,12 +19,14 @@ typedef struct list_s {
 	struct node_t *last;
 } LIST;
 
-void insertTaskSJN(LIST* list, int id, int length);
+void insertTask(LIST* list, int id, int length);
 
 void appendTask(LIST* list, int id, int length);
 
+void appendNode(LIST* list, NODE* node);
+
 void removeTask(LIST* list, int id);
 
-void removeFirst(LIST* list);
+NODE* removeFirst(LIST* list);
 
 #endif

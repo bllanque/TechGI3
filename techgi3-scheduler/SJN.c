@@ -5,22 +5,22 @@
 #include "tasklist.h"
 #include "system.h"
 
-LIST* list;
+LIST* queue;
 
 int init_SJN() {
-	if (list) free(list);
+	if (queue) free(queue);
 	
-	list = (LIST*) malloc(sizeof(LIST));
-	list->first = NULL;
-	list->last = NULL;
+	queue = (LIST*) malloc(sizeof(LIST));
+	queue->first = NULL;
+	queue->last = NULL;
 	
 	return 1;
 }
 
 void arrive_SJN( int id, int length ) {
-	insertTaskSJN(list, id, length);
+	insertTask(queue, id, length);
 	
-	switch_task(list->first->task->id);
+	switch_task(queue->first->task->id);
 }
 
 void tick_SJN() {
@@ -28,10 +28,7 @@ void tick_SJN() {
 }
 
 void finish_SJN( int id ) {
-	removeTask(list, id);
+	removeTask(queue, id);
 	
-	if (list->first)
-		switch_task(list->first->task->id);
-	else 
-		switch_task(IDLE);
+	switch_task((queue->first) ? queue->first->task->id : IDLE);
 }
