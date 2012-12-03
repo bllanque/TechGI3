@@ -65,5 +65,5 @@ void tick_RR_3() {
 }
 
 void finish_RR_3( int id ) {
-	return finish_RR_1(id);
+	finish_RR_1(id);
 }
