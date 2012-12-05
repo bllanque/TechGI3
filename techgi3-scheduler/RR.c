@@ -28,15 +28,17 @@ int init_RR_1() {
 
 void arrive_RR_1( int id , int length ) {
 	appendTask(queue, id, length);
-	
+
 	switch_task(queue->first->task->id);
 }
 
 void tick_RR_1() {
-	if ((tick = tick++ % step) == 0)
+	if ((tick = tick % step) == 0)
 		appendNode(queue, removeFirst(queue));
 
 	switch_task((queue->first) ? queue->first->task->id : IDLE);
+		
+	tick++;
 }
 
 void finish_RR_1( int id ) {

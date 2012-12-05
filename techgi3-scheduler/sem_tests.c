@@ -109,11 +109,9 @@ int testRR( int delta, int* running, void ( *arrive )( int, int ), void ( *tick 
 	}
 
 	int lastTask = IDLE;
- 	int ete = 1;
- 
+
 	for ( i = 0; i < 30 / delta; i++ ) {
 		for ( int k = 0; k < delta; k++ ) {
-//			printf("\n\ni=%i, k=%i\n\n",i,k);
 			tick();
 
 			if ( lastTask == *running ) {
@@ -126,9 +124,9 @@ int testRR( int delta, int* running, void ( *arrive )( int, int ), void ( *tick 
 				return 0;
 			}
 
-//			printf( "Running Task: %d\n", *running );
+			// printf( "Running Task: %d\n", *running );
 			testTask[*running].length--;
-//			printf( "Task remaining length: %d\n", testTask[*running].length );
+			// printf( "Task remaining length: %d\n", testTask[*running].length );
 
 			int j;
 			for ( j = 0; j < MAXTESTTASKS; j++ ) {
@@ -137,8 +135,6 @@ int testRR( int delta, int* running, void ( *arrive )( int, int ), void ( *tick 
 					return 0;
 				}
 			}
-			
-//			printf("Das war die %i. Zeiteinheit\n\n",ete++);
 
 			if ( testTask[*running].length == 0 ) {
 				break;

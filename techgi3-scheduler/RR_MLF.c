@@ -6,22 +6,22 @@
 #include "tasklist.h"
 #include "system.h"
 
-#define DEBUG
+#define DEBUG_
 #define LEVELS 4
 
-LIST* queue[LEVELS];
-int   tick[LEVELS];
+LIST* level[LEVELS];
+int   progress[LEVELS];
 
 int init_RR_MLF() {
 
 	for (int i=0; i < LEVELS; i++) {
-		if (queue[i]) free(queue[i]);
+		if (level[i]) free(level[i]);
 	
-		queue[i] = (LIST*) malloc(sizeof(LIST));
-		queue[i]->first = NULL;
-		queue[i]->last = NULL;
+		level[i] = (LIST*) malloc(sizeof(LIST));
+		level[i]->first = NULL;
+		level[i]->last = NULL;
 		
-		tick[i] = 0;
+		progress[i] = 0;
 	}
 
 	return 1;
@@ -30,48 +30,48 @@ int init_RR_MLF() {
 void arrive_RR_MLF( int id, int length ) {	
 
 	#ifdef DEBUG 
-	printf("debug: running task %d after arrival (on queue 0)\n", id);
+	printf("debug: running task %d after arrival (on level 0)\n", id);
 	#endif
 
-	appendTask(queue[0], id, length);
+	appendTask(level[0], id, length);
 	
-	switch_task(queue[0]->first->task->id);
+	switch_task(level[0]->first->task->id);
 }
 
 void tick_RR_MLF() {
 
 	for (int i=0; i < LEVELS; i++) {
-		tick[i] = tick[i] % (int) pow(2, i+2);
+		progress[i] = progress[i] % (int) pow(2, i+2);
 		
 		#ifdef DEBUG 
-		printf("debug: queue %d is at tick %d of %d\n", i, tick[i], (int) pow(2, i+2)); 
+		printf("debug: level %d is at progress %d of %d\n", i, progress[i], (int) pow(2, i+2)); 
 		#endif
 			
-		if (queue[i]->first) {
-			if (tick[i] == 0 && i < LEVELS-1) {
+		if (level[i]->first) {
+			if (progress[i] == 0 && i < LEVELS-1) {
 			
 				#ifdef DEBUG
-				printf("debug: demoting task %d from queue %d to %d\n", queue[i]->first->task->id, i, i+1);
+				printf("debug: demoting task %d from level %d to %d\n", level[i]->first->task->id, i, i+1);
 				#endif
 
-				appendNode(queue[i+1], removeFirst(queue[i]));
+				appendNode(level[i+1], removeFirst(level[i]));
 				break;
 			}
 		}
 		else
-			tick[i] = 0;
+			progress[i] = 0;
 			
 	}
 
 	for (int i=0; i < LEVELS; i++) {
-		if (queue[i]->first) {
+		if (level[i]->first) {
 
 			#ifdef DEBUG
-			printf("debug: running task %d from queue %d \n", queue[i]->first->task->id, i);
+			printf("debug: running task %d from level %d \n", level[i]->first->task->id, i);
 			#endif
 
-			tick[i]++;
-			switch_task(queue[i]->first->task->id);
+			progress[i]++;
+			switch_task(level[i]->first->task->id);
 			return;
 		}
 	}
@@ -82,25 +82,25 @@ void tick_RR_MLF() {
 void finish_RR_MLF( int id ) {
 
 	for (int i=0; i < LEVELS; i++)
-		if (queue[i]->first) {
+		if (level[i]->first) {
 
 			#ifdef DEBUG
-			printf("debug: removing task %d from queue %d \n", id, i);
+			printf("debug: removing task %d from level %d \n", id, i);
 			#endif
 
-			removeTask(queue[i], id);
-			tick[i] = 0;
+			removeTask(level[i], id);
+			progress[i] = 0;
 			break;
 		}
 	
 	for (int i=0; i < LEVELS; i++)
-		if (queue[i]->first) {
+		if (level[i]->first) {
 		
 			#ifdef DEBUG
-			printf("debug: switching to task %d from queue %d \n", queue[i]->first->task->id, i);
+			printf("debug: switching to task %d from level %d \n", level[i]->first->task->id, i);
 			#endif
 
-			switch_task(queue[i]->first->task->id);
+			switch_task(level[i]->first->task->id);
 			return;
 		}
 
