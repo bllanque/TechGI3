@@ -4,6 +4,9 @@
 #include "tasklist.h"
 #include "system.h"
 
+/**
+ *  insert task in sorted order (by length, asc)
+ */
 void insertTask(LIST* list, int id, int length) {
 	NODE* cursor = list->first;
 	NODE* node = (NODE*) malloc(sizeof(NODE));
@@ -38,6 +41,9 @@ void insertTask(LIST* list, int id, int length) {
 	}
 }
 
+/*
+ *  append task to end of list
+ */ 
 void appendTask(LIST* list, int id, int length) {
 	NODE* node = (NODE*) malloc(sizeof(NODE));
 	task* t = (task*) malloc(sizeof(task));
@@ -51,6 +57,9 @@ void appendTask(LIST* list, int id, int length) {
 	appendNode(list, node);
 }
 
+/*
+ *  append node to end of list
+ */ 
 void appendNode(LIST* list, NODE* node) {
 	if (node) {
 		if (list->first)
@@ -62,6 +71,9 @@ void appendNode(LIST* list, NODE* node) {
 	}
 }
 
+/*
+ *  remove task from (anywhere within) list
+ */
 void removeTask(LIST* list, int id) {
 	NODE* cursor = list->first;
 
@@ -83,6 +95,9 @@ void removeTask(LIST* list, int id) {
 	}
 }
 
+/*
+ *  cut first node off list
+ */
 NODE* removeFirst(LIST* list) {
 	NODE* node = list->first;
 
@@ -94,6 +109,9 @@ NODE* removeFirst(LIST* list) {
 	return node;
 }
 
+/**
+ *  print set of list tuples 
+ */
 void dumpList(LIST* list) {
 	NODE* cursor = list->first;
 	
