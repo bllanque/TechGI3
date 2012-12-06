@@ -1,0 +1,51 @@
+Technische Grundlagen der Informatik 3 - Systemprogrammierung
+Aufgabe 4
+
+
+In diesem Archiv finden Sie die Vorlage für Ihr Programm. Bitte schauen Sie sich
+die Dateien buffer.h und util.h GENAU an, sie enthalten die Erklärung der
+Funktion, die implementiert bzw. verwendet werden sollen. Die Dateien main.c und
+buffer.c sollen von Ihnen entsprechend der Aufgabenstellung ergänzt werden:
+
+Implementieren Sie in main.c die benötigten Threadtypen und verwenden Sie diese
+geeignet. Dazu soll der von Ihnen in buffer.c implementierte Ringpuffer benutzt
+werden.
+
+Im tubIT-Netz kann das Programm direkt nach dem Entpacken mit
+
+ > make
+
+übersetzt werden. Zum Starten führen Sie 
+
+ > ./yeti <textdatei> <Anzahl der Threads>
+
+bzw.
+
+ > make run
+
+aus. Sie können auch entfernt auf den Rechnern des IRB und des tubIT-Netzes
+arbeiten. Unter Unix-Systemen geht das z.B. mit
+
+> ssh fiesta.cs.tu-berlin.de    (CS-Account)
+
+oder
+
+> ssh siesta.cs.tu-berlin.de    (tubIT-Account)
+
+(Fiesta besitzt zwei UltraSPARC T2 CPUs, welche bis zu 128 Threads parallel
+ausführen können.)
+
+Wenn Sie das Programm auf einem anderen Rechner übersetzen möchten,
+müssen Sie ggf. das Makefile entsprechend ihrem System anpassen.
+
+Für die Zeitmessungen geben sie einfach
+
+> make stat
+
+ein, die Statistikdaten werden dann im CSV-Format in der Datei stat.csv abgelegt.
+
+
+Hinweis
+========
+Unter Solaris ist statt "make" wieder "gmake" zu verwenden.
+
